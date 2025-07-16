@@ -42,13 +42,16 @@ export default function AdminUsersPage() {
       }
 
       // Vérifier si l'utilisateur est admin
-      if (!userResponse.data?.roles.includes('ROLE_ADMIN')) {
+      const userData = (userResponse.data as any)?.user || userResponse.data;
+      if (!userData?.roles.includes('ROLE_ADMIN')) {
         setError('Accès non autorisé');
         return;
       }
 
-      setUsers(usersResponse.data || []);
-      setCurrentUser(userResponse.data || undefined);
+      // L'API retourne directement un tableau, pas { data: [...] }
+      const usersData = Array.isArray(usersResponse.data) ? usersResponse.data : [];
+      setUsers(usersData);
+      setCurrentUser(userData || undefined);
     } catch (error) {
       setError('Erreur lors du chargement des données');
     } finally {
