@@ -23,7 +23,7 @@ export default function Navigation({ user }: NavigationProps) {
     return pathname === path;
   };
 
-  const isAdmin = user?.roles.includes('ROLE_ADMIN');
+  const isAdmin = user?.roles && user.roles.includes('ROLE_ADMIN');
 
   return (
     <nav className="bg-white shadow-sm border-b">

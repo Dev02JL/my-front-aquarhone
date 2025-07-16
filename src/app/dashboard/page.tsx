@@ -19,12 +19,18 @@ export default function DashboardPage() {
     try {
       const response = await api.getCurrentUser();
       
+      console.log('API Response:', response); // Debug log
+      
       if (response.error) {
+        console.log('API Error:', response.error); // Debug log
         router.push('/auth');
         return;
       }
 
-      setUser(response.data || undefined);
+      console.log('User data:', response.data); // Debug log
+      // L'API retourne { user: { ... } } au lieu de { data: { ... } }
+      const userData = (response.data as any)?.user || response.data;
+      setUser(userData || undefined);
     } catch (error) {
       console.error('Erreur lors de la récupération des données utilisateur:', error);
       router.push('/auth');
@@ -77,14 +83,18 @@ export default function DashboardPage() {
                     <div>
                       <span className="text-sm font-medium text-gray-600">Rôles:</span>
                       <div className="flex flex-wrap gap-2 mt-1">
-                        {user.roles.map((role, index) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                          >
-                            {role === 'ROLE_ADMIN' ? 'Administrateur' : 'Utilisateur'}
-                          </span>
-                        ))}
+                        {user.roles && user.roles.length > 0 ? (
+                          user.roles.map((role, index) => (
+                            <span
+                              key={index}
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                            >
+                              {role === 'ROLE_ADMIN' ? 'Administrateur' : 'Utilisateur'}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-500 text-sm">Aucun rôle défini</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -107,7 +117,7 @@ export default function DashboardPage() {
                     >
                       Mes réservations
                     </a>
-                    {user.roles.includes('ROLE_ADMIN') && (
+                    {user.roles && user.roles.includes('ROLE_ADMIN') && (
                       <>
                         <a
                           href="/admin/activities"
